@@ -1,0 +1,105 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.BasicTheme": {
+      "version": "9.1.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.1.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.1.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.1.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.TenantManagement": {
+      "version": "9.1.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.1.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.1.1",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.1.1",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "InvoiceManager.Application": {
+      "path": "src/InvoiceManager.Application/InvoiceManager.Application.abppkg",
+      "folder": "src"
+    },
+    "InvoiceManager.Application.Tests": {
+      "path": "test/InvoiceManager.Application.Tests/InvoiceManager.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "InvoiceManager.Domain.Shared": {
+      "path": "src/InvoiceManager.Domain.Shared/InvoiceManager.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "InvoiceManager.Application.Contracts": {
+      "path": "src/InvoiceManager.Application.Contracts/InvoiceManager.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "InvoiceManager.HttpApi": {
+      "path": "src/InvoiceManager.HttpApi/InvoiceManager.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "InvoiceManager.HttpApi.Client": {
+      "path": "src/InvoiceManager.HttpApi.Client/InvoiceManager.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "InvoiceManager.Web": {
+      "path": "src/InvoiceManager.Web/InvoiceManager.Web.abppkg",
+      "folder": "src"
+    },
+    "InvoiceManager.Web.Tests": {
+      "path": "test/InvoiceManager.Web.Tests/InvoiceManager.Web.Tests.abppkg",
+      "folder": "test"
+    },
+    "InvoiceManager.EntityFrameworkCore.Tests": {
+      "path": "test/InvoiceManager.EntityFrameworkCore.Tests/InvoiceManager.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "InvoiceManager.EntityFrameworkCore": {
+      "path": "src/InvoiceManager.EntityFrameworkCore/InvoiceManager.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "InvoiceManager.TestBase": {
+      "path": "test/InvoiceManager.TestBase/InvoiceManager.TestBase.abppkg",
+      "folder": "test"
+    },
+    "InvoiceManager.Domain.Tests": {
+      "path": "test/InvoiceManager.Domain.Tests/InvoiceManager.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "InvoiceManager.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/InvoiceManager.HttpApi.Client.ConsoleTestApp/InvoiceManager.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "InvoiceManager.DbMigrator": {
+      "path": "src/InvoiceManager.DbMigrator/InvoiceManager.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "InvoiceManager.Domain": {
+      "path": "src/InvoiceManager.Domain/InvoiceManager.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}

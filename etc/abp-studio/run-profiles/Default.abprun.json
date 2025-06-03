@@ -1,0 +1,15 @@
+﻿{
+  "applications": {
+    "InvoiceManager.Web": {
+      "type": "dotnet-project",
+      "launchUrl": "https://localhost:44393",
+      "path": "../../../src/InvoiceManager.Web/InvoiceManager.Web.csproj",
+      "kubernetesService": ".*-web$",
+      "healthCheckEndpoint": "/health-status",
+      "healthUiEndpoint": "/health-ui",
+      "execution": {
+        "order": 2
+      }
+    }
+  }
+}
