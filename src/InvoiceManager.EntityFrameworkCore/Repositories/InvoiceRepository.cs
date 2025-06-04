@@ -19,9 +19,11 @@ public class InvoiceRepository :
     {
     }
 
-    public async Task<Invoice> GetByIdIncludeDetailsAsync(Guid id)
+    public async Task<Invoice?> GetByIdIncludeDetailsAsync(Guid id)
     {
-        return await GetAsync(id, includeDetails: true);
+        return await (await GetDbSetAsync())
+        .Include(x => x.Lines)
+        .SingleOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<List<Invoice>> GetFilteredListAsync(
@@ -31,11 +33,11 @@ public class InvoiceRepository :
         InvoiceState? state = null)
     {
         var queryable = (await GetQueryableAsync())
-            .Include(x => x.Lines)
             .WhereIf(!invoiceNumberFilter.IsNullOrEmpty(),
                 x => x.InvoiceNumber.Contains(invoiceNumberFilter))
             .WhereIf(state.HasValue,
-                x => x.State == state.Value);
+                x => x.State == state.Value)
+            .OrderBy(x => x.CreationTime); ;
 
         var items = await queryable
             .PageBy(skipCount, maxResultCount)

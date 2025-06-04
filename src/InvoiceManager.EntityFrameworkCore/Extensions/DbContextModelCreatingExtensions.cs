@@ -39,7 +39,6 @@ public static class DbContextModelCreatingExtensions
             b.ConfigureByConvention();
 
             b.Property(x => x.InvoiceId).IsRequired();
-            b.Property(x => x.ProductId).IsRequired();
             b.Property(x => x.ProductName)
                 .IsRequired()
                 .HasMaxLength(InvoiceConsts.MaxProductNameLength);

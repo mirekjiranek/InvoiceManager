@@ -27,17 +27,17 @@ public class Invoice : FullAuditedAggregateRoot<Guid>
         TotalAmount = 0;
     }
 
-    public virtual InvoiceLine AddLine(Guid productId, string productName, int quantity, decimal unitPrice)
+    public virtual InvoiceLine AddLine(string productName, int quantity, decimal unitPrice)
     {
-        var line = new InvoiceLine(Guid.NewGuid(), Id, productId, productName, quantity, unitPrice);
+        var line = new InvoiceLine(Guid.NewGuid(), Id, productName, quantity, unitPrice);
         Lines.Add(line);
         RecalculateTotalAmount();
         return line;
     }
 
-    public virtual void RemoveLine(Guid lineId)
+    public virtual void RemoveLine(Guid productId)
     {
-        var line = Lines.SingleOrDefault(l => l.Id == lineId);
+        var line = Lines.SingleOrDefault(l => l.Id == productId);
         if (line != null)
         {
             Lines.Remove(line);
@@ -45,9 +45,9 @@ public class Invoice : FullAuditedAggregateRoot<Guid>
         }
     }
 
-    public virtual void UpdateLine(Guid lineId, int quantity, decimal unitPrice)
+    public virtual void UpdateLine(Guid productId, int quantity, decimal unitPrice)
     {
-        var line = Lines.SingleOrDefault(l => l.Id == lineId) ?? throw new BusinessException("InvoiceLine:NotFound", $"Invoice line with id {lineId} not found");
+        var line = Lines.SingleOrDefault(l => l.Id == productId) ?? throw new BusinessException("InvoiceLine:NotFound", $"Invoice line with id {productId} not found");
         line.Update(quantity, unitPrice);
         RecalculateTotalAmount();
     }
