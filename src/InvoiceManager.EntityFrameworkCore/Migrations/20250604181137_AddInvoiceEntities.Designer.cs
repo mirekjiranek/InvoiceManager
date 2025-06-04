@@ -4,6 +4,7 @@ using InvoiceManager.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace InvoiceManager.Migrations
 {
     [DbContext(typeof(InvoiceManagerDbContext))]
-    partial class InvoiceManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250604181137_AddInvoiceEntities")]
+    partial class AddInvoiceEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,6 +102,9 @@ namespace InvoiceManager.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("InvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ProductName")
