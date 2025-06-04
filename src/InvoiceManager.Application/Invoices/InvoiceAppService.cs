@@ -38,6 +38,8 @@ public class InvoiceAppService : InvoiceManagerAppService, IInvoiceAppService
     [AllowAnonymous]
     public async Task<PagedResultDto<InvoiceDto>> GetListAsync(GetInvoicesInput input)
     {
+        var totalCount = await _invoiceRepository.GetCountAsync();
+
         var invoices = await _invoiceRepository.GetFilteredListAsync(
             input.SkipCount,
             input.MaxResultCount,
@@ -46,7 +48,7 @@ public class InvoiceAppService : InvoiceManagerAppService, IInvoiceAppService
 
         return new PagedResultDto<InvoiceDto>
         {
-            TotalCount = invoices.Count,
+            TotalCount = totalCount, 
             Items = ObjectMapper.Map<List<Invoice>, List<InvoiceDto>>(invoices)
         };
     }
@@ -75,25 +77,40 @@ public class InvoiceAppService : InvoiceManagerAppService, IInvoiceAppService
     public async Task<InvoiceDto> AddLineAsync(Guid invoiceId, AddInvoiceLineDto input)
     {
         var invoice = await _invoiceRepository.GetByIdIncludeDetailsAsync(invoiceId);
-        invoice.AddLine(input.ProductId, input.ProductName, input.Quantity, input.UnitPrice);
+        if (invoice == null)
+        {
+            throw new EntityNotFoundException(typeof(Invoice), invoiceId);
+        }
+
+        invoice.AddLine(input.ProductName, input.Quantity, input.UnitPrice);
         await _invoiceRepository.UpdateAsync(invoice);
         return ObjectMapper.Map<Invoice, InvoiceDto>(invoice);
     }
 
     [Authorize]
-    public async Task<InvoiceDto> UpdateLineAsync(Guid invoiceId, Guid lineId, UpdateInvoiceLineDto input)
+    public async Task<InvoiceDto> UpdateLineAsync(Guid invoiceId, Guid productId, UpdateInvoiceLineDto input)
     {
         var invoice = await _invoiceRepository.GetByIdIncludeDetailsAsync(invoiceId);
-        invoice.UpdateLine(lineId, input.Quantity, input.UnitPrice);
+        if (invoice == null)
+        {
+            throw new EntityNotFoundException(typeof(Invoice), invoiceId);
+        }
+
+        invoice.UpdateLine(productId, input.Quantity, input.UnitPrice);
         await _invoiceRepository.UpdateAsync(invoice);
         return ObjectMapper.Map<Invoice, InvoiceDto>(invoice);
     }
 
     [Authorize]
-    public async Task DeleteLineAsync(Guid invoiceId, Guid lineId)
+    public async Task DeleteLineAsync(Guid invoiceId, Guid productId)
     {
         var invoice = await _invoiceRepository.GetByIdIncludeDetailsAsync(invoiceId);
-        invoice.RemoveLine(lineId);
+        if (invoice == null)
+        {
+            throw new EntityNotFoundException(typeof(Invoice), invoiceId);
+        }
+
+        invoice.RemoveLine(productId);
         await _invoiceRepository.UpdateAsync(invoice);
     }
 
@@ -101,6 +118,11 @@ public class InvoiceAppService : InvoiceManagerAppService, IInvoiceAppService
     public async Task<InvoiceDto> ApproveAsync(Guid id)
     {
         var invoice = await _invoiceRepository.GetByIdIncludeDetailsAsync(id);
+        if (invoice == null)
+        {
+            throw new EntityNotFoundException(typeof(Invoice), id);
+        }
+
         invoice.Approve();
         await _invoiceRepository.UpdateAsync(invoice);
         return ObjectMapper.Map<Invoice, InvoiceDto>(invoice);
@@ -110,6 +132,11 @@ public class InvoiceAppService : InvoiceManagerAppService, IInvoiceAppService
     public async Task<InvoiceDto> PayAsync(Guid id)
     {
         var invoice = await _invoiceRepository.GetAsync(id);
+        if (invoice == null)
+        {
+            throw new EntityNotFoundException(typeof(Invoice), id);
+        }
+
         invoice.Pay();
         await _invoiceRepository.UpdateAsync(invoice);
         return ObjectMapper.Map<Invoice, InvoiceDto>(invoice);
