@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Auditing;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 
 namespace InvoiceManager.Invoices;
 
+[Audited]
 public class InvoiceAppService : InvoiceManagerAppService, IInvoiceAppService
 {
     private readonly IInvoiceRepository _invoiceRepository;

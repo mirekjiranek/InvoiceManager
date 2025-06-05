@@ -27,11 +27,7 @@ public class Program
                 .UseSerilog((context, services, loggerConfiguration) =>
                 {
                     loggerConfiguration
-                    #if DEBUG
-                        .MinimumLevel.Debug()
-                    #else
                         .MinimumLevel.Information()
-                    #endif
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                         .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
