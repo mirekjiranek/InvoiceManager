@@ -6,7 +6,7 @@ namespace InvoiceManager.Invoices.DTOs;
 
 public class InvoiceDto : FullAuditedEntityDto<Guid>
 {
-    public string InvoiceNumber { get; set; }
+    public required string InvoiceNumber { get; set; }
     public DateTime IssueDate { get; set; }
     public decimal TotalAmount { get; set; }
     public InvoiceState State { get; set; }

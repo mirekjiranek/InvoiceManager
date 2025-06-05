@@ -29,12 +29,12 @@ public class InvoiceRepository :
     public async Task<List<Invoice>> GetFilteredListAsync(
         int skipCount,
         int maxResultCount,
-        string invoiceNumberFilter = null,
+        string? invoiceNumberFilter = null,
         InvoiceState? state = null)
     {
         var queryable = (await GetQueryableAsync())
             .WhereIf(!invoiceNumberFilter.IsNullOrEmpty(),
-                x => x.InvoiceNumber.Contains(invoiceNumberFilter))
+                x => x.InvoiceNumber.Contains(invoiceNumberFilter!))
             .WhereIf(state.HasValue,
                 x => x.State == state.Value)
             .OrderBy(x => x.CreationTime); ;

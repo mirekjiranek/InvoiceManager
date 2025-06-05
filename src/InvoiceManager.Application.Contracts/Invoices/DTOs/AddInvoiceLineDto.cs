@@ -7,7 +7,7 @@ public class AddInvoiceLineDto
 {
     [Required]
     [StringLength(InvoiceConsts.MaxProductNameLength, MinimumLength = 1)]
-    public string ProductName { get; set; }
+    public required string ProductName { get; set; }
 
     [Range(1, int.MaxValue)]
     public int Quantity { get; set; }

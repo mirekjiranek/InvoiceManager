@@ -8,12 +8,15 @@ namespace InvoiceManager.Invoices;
 public class InvoiceLine : Entity<Guid>
 {
     public virtual Guid InvoiceId { get; private set; }
-    public virtual string ProductName { get; private set; }
+    public virtual string ProductName { get; private set; } = string.Empty;
     public virtual int Quantity { get; private set; }
     public virtual decimal UnitPrice { get; private set; }
     public virtual decimal TotalPrice { get; private set; }
 
-    protected InvoiceLine() { }
+    protected InvoiceLine() 
+    {
+        ProductName = string.Empty;
+    }
 
     internal InvoiceLine(Guid id, Guid invoiceId, string productName, int quantity, decimal unitPrice) : base(id)
     {

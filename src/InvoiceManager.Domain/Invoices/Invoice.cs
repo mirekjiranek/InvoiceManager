@@ -9,14 +9,18 @@ namespace InvoiceManager.Invoices;
 
 public class Invoice : FullAuditedAggregateRoot<Guid>
 {
-    public virtual string InvoiceNumber { get; private set; }
+    public virtual string InvoiceNumber { get; private set; } = string.Empty;
     public virtual DateTime IssueDate { get; private set; }
     public virtual decimal TotalAmount { get; private set; }
     public virtual InvoiceState State { get; private set; }
 
     public virtual ICollection<InvoiceLine> Lines { get; protected set; }
 
-    protected Invoice() { }
+    protected Invoice() 
+    {
+        InvoiceNumber = string.Empty;
+        Lines = new Collection<InvoiceLine>();
+    }
 
     public Invoice(Guid id, string invoiceNumber, DateTime issueDate) : base(id)
     {
