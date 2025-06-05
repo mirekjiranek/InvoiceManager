@@ -1,58 +1,107 @@
-﻿# InvoiceManager
+﻿# Invoice Manager - ABP.io Aplikace
 
-## About this solution
+## Popis domény
 
-This is a layered startup solution based on [Domain Driven Design (DDD)](https://abp.io/docs/latest/framework/architecture/domain-driven-design) practises. All the fundamental ABP modules are already installed. Check the [Application Startup Template](https://abp.io/docs/latest/solution-templates/layered-web-application) documentation for more info.
+Aplikace eviduje **faktury** a jejich **položky** postavená na ABP Framework 9.1.1.
 
-### Pre-requirements
+### Doménový model
 
-* [.NET9.0+ SDK](https://dotnet.microsoft.com/download/dotnet)
-* [Node v18 or 20](https://nodejs.org/en)
+**Invoice (Faktura):**
+- InvoiceId, InvoiceNumber, IssueDate, TotalAmount
+- State: Created → Approved → Paid
+- Kolekce InvoiceLine
 
-### Configurations
+**InvoiceLine (Řádek faktury):**
+- ProductName, Quantity, UnitPrice, TotalPrice
+- TotalPrice = Quantity × UnitPrice
 
-The solution comes with a default configuration that works out of the box. However, you may consider to change the following configuration before running your solution:
+**Business pravidla:**
+- TotalAmount faktury se automaticky přepočítává při změnách řádků
+- Faktura musí mít řádky před schválením
+- Pouze schválené faktury lze uhradit
 
-* Check the `ConnectionStrings` in `appsettings.json` files under the `InvoiceManager.Web` and `InvoiceManager.DbMigrator` projects and change it if you need.
+## Architektura
 
-### Before running the application
-
-* Run `abp install-libs` command on your solution folder to install client-side package dependencies. This step is automatically done when you create a new solution, if you didn't especially disabled it. However, you should run it yourself if you have first cloned this solution from your source control, or added a new client-side package dependency to your solution.
-* Run `InvoiceManager.DbMigrator` to create the initial database. This step is also automatically done when you create a new solution, if you didn't especially disabled it. This should be done in the first run. It is also needed if a new database migration is added to the solution later.
-
-#### Generating a Signing Certificate
-
-In the production environment, you need to use a production signing certificate. ABP Framework sets up signing and encryption certificates in your application and expects an `openiddict.pfx` file in your application.
-
-To generate a signing certificate, you can use the following command:
-
+Projekt byl vytvořen pomocí **ABP CLI**:
 ```bash
-dotnet dev-certs https -v -ep openiddict.pfx -p 07a68c1d-3842-42c8-9ba7-f25824063d62
+abp new InvoiceManager --ui no-ui -m none --theme basic -csf
 ```
 
-> `07a68c1d-3842-42c8-9ba7-f25824063d62` is the password of the certificate, you can change it to any password you want.
+Aplikace využívá **layered architecture** ABP.io s důrazem na efektivní použití ABP frameworku:
 
-It is recommended to use **two** RSA certificates, distinct from the certificate(s) used for HTTPS: one for encryption, one for signing.
+- **Domain** - entity Invoice, InvoiceLine s business logikou
+- **Application** - InvoiceAppService pro CRUD operace a změny stavů
+- **Infrastructure** - EF Core repository a DbContext
+- **Web** - ASP.NET Core s REST API a Swagger UI
 
-For more information, please refer to: [OpenIddict Certificate Configuration](https://documentation.openiddict.com/configuration/encryption-and-signing-credentials.html#registering-a-certificate-recommended-for-production-ready-scenarios)
+### Využití ABP.io architektury
 
-> Also, see the [Configuring OpenIddict](https://abp.io/docs/latest/Deployment/Configuring-OpenIddict#production-environment) documentation for more information.
+- **Moduly pro autentizace** - ABP Identity modul pro registraci/přihlášení
+- **Auditing** - `[Audited]` atribut na InvoiceAppService pro automatické logování
+- **Base classes** - `FullAuditedAggregateRoot<Guid>` pro Invoice entity
+- **DTO mapování** - AutoMapper integrace s `InvoiceManagerAppService` base třídou
+- **Repository pattern** - `IRepository<T>` interface s custom `IInvoiceRepository`
+- **Exception handling** - `BusinessException` pro business validace
+- **Authorization** - `[Authorize]` a `[AllowAnonymous]` atributy
 
-### Solution structure
+## REST API
 
-This is a layered monolith application that consists of the following applications:
+### Veřejné
+- `GET /api/app/invoice/{id}` - detail faktury
+- `GET /api/app/invoice` - seznam faktur
 
-* `InvoiceManager.DbMigrator`: A console application which applies the migrations and also seeds the initial data. It is useful on development as well as on production environment.
-* `InvoiceManager.Web`: ASP.NET Core MVC / Razor Pages application that is the essential web application of the solution.
+### Autorizované  
+- `POST /api/app/invoice` - vytvoření faktury
+- `POST /api/app/invoice/{id}/lines` - přidání řádku
+- `PUT /api/app/invoice/{invoiceId}/lines/{lineId}` - úprava řádku
+- `DELETE /api/app/invoice/{invoiceId}/lines/{lineId}` - smazání řádku
+- `POST /api/app/invoice/{id}/approve` - schválení
+- `POST /api/app/invoice/{id}/pay` - uhrazení
 
+### Autentizace pro autorizované endpointy
+Pro přístup k autorizovaným endpointům je nutné:
 
-## Deploying the application
+1. **Přihlášení:** `POST /api/account/login` (username/password)
+2. **Registrace:** `POST /api/account/register` (pro nové uživatele)
 
-Deploying an ABP application follows the same process as deploying any .NET or ASP.NET Core application. However, there are important considerations to keep in mind. For detailed guidance, refer to ABP's [deployment documentation](https://abp.io/docs/latest/Deployment/Index).
+**Výchozí admin účet:** ABP automaticky vytváří během database seedu defaultního uživatele:
+- Username: `admin`
+- Password: `1q2w3E*`
 
-### Additional resources
+ABP automaticky poskytuje tyto endpointy díky `AbpAccountWebOpenIddictModule`.
 
-You can see the following resources to learn more about your solution and the ABP Framework:
+## Spuštění aplikace
 
-* [Web Application Development Tutorial](https://abp.io/docs/latest/tutorials/book-store/part-1)
-* [Application Startup Template](https://abp.io/docs/latest/startup-templates/application/index)
+### Předpoklady
+- .NET 9.0 SDK
+- SQL Server
+
+### Kroky
+1. **Instalace balíčků:** `abp install-libs`
+2. **Migrace databáze:** `dotnet run --project src/InvoiceManager.DbMigrator`
+3. **Spuštění:** `dotnet run --project src/InvoiceManager.Web`
+
+**Poznámka:** Všechny příkazy volat z root adresáře projektu.
+
+4. **Přístup:** 
+   - **Aplikace:** `https://localhost:44393/swagger`
+   - **Databáze:** Server: `(LocalDb)\MSSQLLocalDB`, Databáze: `InvoiceManager`
+
+## Validace
+
+### Formální validace (Data Annotations)
+- Required atributy pro povinná pole
+- StringLength validace pro číslo faktury a název produktu
+- Range validace pro množství (min 1) a jednotkovou cenu (min 0.01)
+- ABP automaticky aplikuje tyto validace před voláním aplikačních služeb
+
+### Business validace
+- **Invoice entity:** kontrola stavů při změnách, validace neprázdné faktury před schválením
+- **InvoiceLine entity:** kontrola kladných hodnot pomocí ABP Check utility
+- **Aplikační služby:** kontrola jedinečnosti čísla faktury, ověření existence entit
+- Automatické přepočítávání celkových částek při změnách řádků
+- Použití ABP BusinessException pro business chyby
+
+## Testování
+
+Aplikace obsahuje **unit testy** pro doménové objekty (`InvoiceTests`, `InvoiceLineTests`) ověřující správnost business logiky, validací a stavových změn entit.
